@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru" class="html">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <title>Excel to JSON | Javacodepoint</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.min.js"></script>
+    <link rel="preload" href="fonts/PT-Root-UI_Regular.woff2" as="font" crossorigin="anonymous">
+    <link rel="preload" href="fonts/PT-Root-UI_Bold.woff2" as="font" crossorigin="anonymous">
+    <link rel="preload" href="fonts/PT-Root-UI_Regular.woff" as="font" crossorigin="anonymous">
+    <link rel="preload" href="fonts/PT-Root-UI_Bold.woff" as="font" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.min.css" />
+</head>
+
+<body class="body">
+  <header class="header">
+    <h1>Upload an excel file to convert into JSON</h1>
+  </header>
+  <main class="main">
+    <input type="file" id="file_upload" />
+    <button onclick="upload()">Upload</button>
+    <br>
+    <br>
+    <textarea id="json-result" style="display:block;height:500px;width:350px;"></textarea>
+  </main>
+  <footer class="footer">
+    <script>// Method to upload a valid excel file
+      function upload() {
+        var files = document.getElementById('file_upload').files;
+        if(files.length==0){
+          alert("Please choose any file...");
+          return;
+        }
+        var filename = files[0].name;
+        var extension = filename.substring(filename.lastIndexOf(".")).toUpperCase();
+        if (extension == '.XLS' || extension == '.XLSX') {
+          excelFileToJSON(files[0]);
+        }
+        else{
+          alert("Please select a valid excel file.");
+        }
+      }
+      //Method to read excel file and convert it into JSON
+      function excelFileToJSON(file){
+        try {
+          var reader = new FileReader();
+          reader.readAsBinaryString(file);
+          reader.onload = function(e) {
+            var data = e.target.result;
+            var workbook = XLSX.read(data, {
+              type : 'binary'
+            }
+                                    );
+            var result = {
+            };
+            workbook.SheetNames.forEach(function(sheetName) {
+              var roa = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+              if (roa.length > 0) {
+                result[sheetName] = roa;
+              }
+            }
+                                       );
+            //displaying the json result
+            var resultEle=document.getElementById("json-result");
+            resultEle.value=JSON.stringify(result, null, 4);
+            resultEle.style.display='block';
+          }
+        }
+        catch(e){
+          console.error(e);
+        }
+      }
+    </script>
+  </footer>
+  <input type="file" name="file" id="file">
+  <script src="./js/main.js" type="module"></script>
+</body>
+<!--
+  <picture>
+    <source media="(max-width: 767.99px)" type="image/webp" srcset="img/catalog-components-mobile.webp, img/catalog-components-mobile@2x.webp 2x">
+    <source media="(max-width: 767.99px)" srcset="img/catalog-components-mobile.png, img/catalog-components-mobile@2x.png 2x">
+    <source media="(max-width: 1023.99px)" type="image/webp" srcset="img/catalog-components-tablet.webp, img/catalog-components-tablet@2x.webp 2x">
+    <source media="(max-width: 1023.99px)" srcset="img/catalog-components-tablet.png, img/catalog-components-tablet@2x.png 2x">
+    <source type="image/webp" srcset="img/catalog-components-desktop.webp, img/catalog-components-desktop@2x.webp 2x">
+    1x: width: 370 height: 620  2x: width: 740 height: 1240
+    <img src="img/catalog-components-desktop.png" srcset="img/catalog-components-desktop@2x.png 2x" width="370" height="620" alt="Печатная плата">
+  </picture>
+-->
+
+</html>
